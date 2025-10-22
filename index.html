@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web閲覧リスト</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
+
+    <div id="app-container">
+        <header>
+            <h1>Web閲覧リスト</h1>
+            <div class="header-actions">
+                <button id="show-manual-btn" class="header-btn help-btn">取扱説明書</button>
+                <button id="save-data-btn" class="header-btn">Webページ保存(CSV)</button>
+                <button id="load-data-btn" class="header-btn">Webページ読込(CSV)</button>
+                <button id="reset-data-btn" class="header-btn danger-btn">データリセット</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="left-pane">
+                <div id="tabs-container" class="tabs-container"></div>
+                <div id="webpage-list-container"></div>
+            </div>
+            <div class="right-pane">
+                <div class="control-panel">
+                    <div id="control-tabs-container" class="tabs-container">
+                        <div class="tab active" data-tab="register">登録</div>
+                        <div id="edit-mode-tab" class="tab disabled" data-tab="edit">編集</div>
+                    </div>
+                    <div id="register-panel" class="control-tab-content">
+                        <section class="control-section">
+                            <h3>Webページの登録</h3>
+                            <input type="text" id="title" placeholder="タイトル">
+                            <input type="url" id="url" placeholder="URL">
+                            <select id="category"></select>
+                            <textarea id="memo" placeholder="メモ"></textarea>
+                            <button id="add-btn" class="action-btn">登録する</button>
+                        </section>
+                    </div>
+                    <div id="edit-panel" class="control-tab-content hidden">
+                        <section class="control-section">
+                            <h3>Webページの編集</h3>
+                            <input type="hidden" id="edit-id">
+                            <input type="text" id="edit-title" placeholder="タイトル">
+                            <input type="url" id="edit-url" placeholder="URL">
+                            <select id="edit-category"></select>
+                            <textarea id="edit-memo" placeholder="メモ"></textarea>
+                            <button id="update-btn" class="action-btn">更新する</button>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
