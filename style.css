@@ -29,14 +29,10 @@ header {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 header h1 { margin: 0; font-size: 1.8em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
-
-/* ▼▼▼▼▼ 修正箇所 ▼▼▼▼▼ */
 .header-actions {
-    display: flex; /* ボタンをフレックスボックスで横並びにする */
-    align-items: center; /* ボタンの縦方向の位置を中央に揃える */
+    display: flex;
+    align-items: center;
 }
-/* ▲▲▲▲▲ 修正箇所 ▲▲▲▲▲ */
-
 .header-btn {
     margin-left: 10px;
     padding: 10px 18px;
@@ -47,7 +43,7 @@ header h1 { margin: 0; font-size: 1.8em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2
     color: var(--primary-color);
     font-weight: 700;
     transition: all 0.3s ease;
-    white-space: nowrap; /* ボタン内のテキストが改行しないようにする */
+    white-space: nowrap;
 }
 .header-btn:hover { transform: translateY(-2px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 .header-btn.help-btn { color: var(--help-color); }
@@ -63,21 +59,24 @@ header h1 { margin: 0; font-size: 1.8em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2
 .tab { padding: 10px 20px; cursor: pointer; margin-bottom: -2px; border: 2px solid transparent; border-bottom: none; font-weight: 700; color: #aaa; transition: all 0.3s ease; }
 .tab.active { color: var(--primary-color); border-color: #eee; border-top-left-radius: var(--border-radius); border-top-right-radius: var(--border-radius); background-color: #f9f9f9; }
 .tab.disabled { color: #ccc; cursor: not-allowed; pointer-events: none; }
+
 #webpage-list-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 8px; /* 項目間の隙間をさらに狭く */
     list-style: none;
     padding: 5px;
     margin: 0 -5px;
     overflow-y: auto;
     flex-grow: 1;
 }
+
+/* ▼▼▼▼▼ 変更箇所 ▼▼▼▼▼ */
 .webpage-item {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 15px;
+    padding: 8px; /* 項目の内側の余白をさらに狭く */
     border: 1px solid #f0f0f0;
     margin-bottom: 0;
     border-radius: var(--border-radius);
@@ -85,11 +84,31 @@ header h1 { margin: 0; font-size: 1.8em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .webpage-item:hover { transform: scale(1.02); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); }
-.item-content { margin-bottom: 10px; }
-.item-content a { font-weight: bold; text-decoration: none; color: #007bff; font-size: 1.1em; }
-.item-meta { font-size: 0.9em; color: #999; margin: 4px 0 0; }
+.item-content { margin-bottom: 4px; }
+.item-content a {
+    font-weight: bold;
+    text-decoration: none;
+    color: #007bff;
+    font-size: 0.9em; /* タイトルのフォントサイズをさらに小さく */
+}
+.item-meta {
+    font-size: 0.75em; /* カテゴリのフォントサイズをさらに小さく */
+    color: #999;
+    margin: 2px 0 0; /* タイトルとの余白を狭く */
+}
 .item-actions { align-self: flex-end; }
-.item-actions button { margin-left: 8px; padding: 8px 12px; border: none; cursor: pointer; border-radius: 8px; font-weight: 700; transition: all 0.2s ease; }
+.item-actions button {
+    margin-left: 6px; /* ボタン間の余白を狭く */
+    padding: 3px 8px; /* ボタンの余白をさらに狭く */
+    border: none;
+    cursor: pointer;
+    border-radius: 6px; /* ボタンの角丸を調整 */
+    font-weight: 700;
+    transition: all 0.2s ease;
+    font-size: 0.8em; /* ボタンの文字サイズを小さく */
+}
+/* ▲▲▲▲▲ 変更箇所 ▲▲▲▲▲ */
+
 .item-actions button:hover { opacity: 0.8; }
 .edit-btn { background-color: var(--secondary-color); color: var(--text-color); }
 .delete-btn { background-color: var(--danger-color); color: white; }
