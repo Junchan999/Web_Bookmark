@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoryListContainer = document.getElementById('category-list-container');
 
     // --- データ管理 ---
-    const defaultCategories = ["総合", "YouTube(一般)", "YouTube(趣味)", "学習" , "ツール" , "AI活用", "ブログ関連", "趣味" , "自作アプリ", "その他"];
+    const defaultCategories = ["総合", "YouTube(一般)", "YouTube(趣味)", "学習" , "ツール" , "AI活用", "ブログ関連" ];
     let webpages = [];
     let categories = [...defaultCategories];
     let activeCategory = '総合';
