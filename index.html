@@ -14,9 +14,13 @@
 
     <div id="app-container">
         <header>
-            <h1>Web閲覧リスト</h1>
+            <h1>Web閲覧リストVer1.20</h1>
             <div class="header-actions">
                 <button id="show-manual-btn" class="header-btn help-btn">取扱説明書</button>
+                <!-- ▼▼▼▼▼ ここから追加 ▼▼▼▼▼ -->
+                <button id="backup-data-btn" class="header-btn action-btn-alt">データバックアップ</button>
+                <button id="restore-data-btn" class="header-btn action-btn-alt">データ復元</button>
+                <!-- ▲▲▲▲▲ ここまで追加 ▲▲▲▲▲ -->
                 <button id="save-data-btn" class="header-btn">Webページ保存(CSV)</button>
                 <button id="load-data-btn" class="header-btn">Webページ読込(CSV)</button>
                 <button id="reset-data-btn" class="header-btn danger-btn">データリセット</button>
@@ -33,6 +37,7 @@
                     <div id="control-tabs-container" class="tabs-container">
                         <div class="tab active" data-tab="register">登録</div>
                         <div id="edit-mode-tab" class="tab disabled" data-tab="edit">編集</div>
+                        <div class="tab" data-tab="category-manage">カテゴリ管理</div>
                     </div>
                     <div id="register-panel" class="control-tab-content">
                         <section class="control-section">
@@ -53,6 +58,17 @@
                             <select id="edit-category"></select>
                             <textarea id="edit-memo" placeholder="メモ"></textarea>
                             <button id="update-btn" class="action-btn">更新する</button>
+                        </section>
+                    </div>
+                    <div id="category-manage-panel" class="control-tab-content hidden">
+                        <section class="control-section">
+                            <h3>カテゴリの追加</h3>
+                            <input type="text" id="new-category-name" placeholder="新しいカテゴリ名">
+                            <button id="add-category-btn" class="action-btn">追加する</button>
+                        </section>
+                        <section class="control-section">
+                            <h3>カテゴリの編集・削除</h3>
+                            <div id="category-list-container"></div>
                         </section>
                     </div>
                 </div>

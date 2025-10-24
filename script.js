@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const fileInput = document.getElementById('csv-file-input');
     const manualBtn = document.getElementById('show-manual-btn');
     const resetDataBtn = document.getElementById('reset-data-btn');
+    // ▼▼▼▼▼ ここから追加 ▼▼▼▼▼
+    const backupDataBtn = document.getElementById('backup-data-btn');
+    const restoreDataBtn = document.getElementById('restore-data-btn');
+    // ▲▲▲▲▲ ここまで追加 ▲▲▲▲▲
     
     const titleInput = document.getElementById('title');
     const urlInput = document.getElementById('url');
@@ -21,6 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const controlTabsContainer = document.getElementById('control-tabs-container');
     const editModeTab = document.getElementById('edit-mode-tab');
+
+    const newCategoryNameInput = document.getElementById('new-category-name');
+    const addCategoryBtn = document.getElementById('add-category-btn');
+    const categoryListContainer = document.getElementById('category-list-container');
 
     // --- データ管理 ---
     const defaultCategories = ["総合", "YouTube(一般)", "YouTube(趣味)", "学習" , "ツール" , "AI活用", "ブログ関連", "趣味" , "自作アプリ", "その他"];
@@ -42,9 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             webpages = JSON.parse(savedWebpages);
         }
 
-        // ▼▼▼▼▼ 修正箇所 ▼▼▼▼▼
         if (savedCategories) {
-            // 保存されたカテゴリとデフォルトカテゴリを統合し、正しい順序を維持する
             const parsedCategories = JSON.parse(savedCategories);
             const allUniqueCategories = [...new Set([...defaultCategories, ...parsedCategories])];
             categories = allUniqueCategories.sort((a, b) => {
@@ -55,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return indexA - indexB;
             });
         }
-        // ▲▲▲▲▲ 修正箇所 ▲▲▲▲▲
     };
 
     // --- 描画関連の関数 ---
@@ -63,17 +68,21 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCategories();
         renderTabs();
         renderWebpages();
+        renderCategoryManagement();
     };
     const renderCategories = () => {
         const selects = [categorySelect, editCategorySelect];
         selects.forEach(sel => {
             const currentVal = sel.value;
             sel.innerHTML = '';
-            const categoriesForSelect = categories.filter(cat => cat !== "総合");
+            const categoriesForSelect = categories.filter(cat => cat !== "総合" && cat !== "その他");
             categoriesForSelect.forEach(cat => {
                 sel.add(new Option(cat, cat));
             });
-            sel.value = currentVal;
+            if (categories.includes("その他")) {
+                 sel.add(new Option("その他", "その他"));
+            }
+            sel.value = currentVal || 'その他';
         });
     };
     const renderTabs = () => {
@@ -104,12 +113,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="item-content">
                     <a href="${item.url}" target="_blank" title="${item.url}">${item.title}</a>
                     <p class="item-meta">カテゴリ: ${item.category}</p>
+                    ${item.memo ? `<p class="item-memo" title="${item.memo}">${item.memo}</p>` : ''}
                 </div>
                 <div class="item-actions">
                     <button class="edit-btn">編集</button>
                     <button class="delete-btn">削除</button>
                 </div>`;
             webpageListContainer.appendChild(div);
+        });
+    };
+
+    const renderCategoryManagement = () => {
+        categoryListContainer.innerHTML = '';
+        categories.filter(cat => cat !== '総合').forEach(cat => {
+            const item = document.createElement('div');
+            item.className = 'category-manage-item';
+            item.dataset.categoryName = cat;
+
+            const actionsHTML = `
+                <div class="category-actions">
+                    <button class="edit-category-btn">編集</button>
+                    <button class="delete-category-btn">削除</button>
+                </div>`;
+
+            item.innerHTML = `
+                <span class="category-name">${cat}</span>
+                ${actionsHTML}
+            `;
+            categoryListContainer.appendChild(item);
         });
     };
 
@@ -131,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- イベントリスナー ---
     controlTabsContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('tab') && !e.target.classList.contains('active')) {
+        if (e.target.classList.contains('tab') && !e.target.classList.contains('disabled')) {
             switchControlTab(e.target.dataset.tab);
         }
     });
@@ -189,16 +220,124 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     resetDataBtn.addEventListener('click', () => {
-        if (confirm('本当にすべてのデータをリセットしますか？\nWebページとカテゴリの情報が初期状態に戻ります。\nこの操作は元に戻せません。')) {
+        if (confirm('本当にすべてのデータをリセットしますか？\nWebページとカテゴリの情報が初期状態に戻ります。\nこの操作は元に戻せません。\n\n※事前に「データバックアップ」をしておくことをお勧めします。')) {
             localStorage.removeItem('webpagesData');
             localStorage.removeItem('categoriesData');
             alert('データをリセットしました。');
             location.reload();
         }
     });
+
+    // ▼▼▼▼▼ ここから追加 ▼▼▼▼▼
+    backupDataBtn.addEventListener('click', () => {
+        localStorage.setItem('backup_webpagesData', JSON.stringify(webpages));
+        localStorage.setItem('backup_categoriesData', JSON.stringify(categories));
+        alert('現在のデータをバックアップしました。');
+    });
+
+    restoreDataBtn.addEventListener('click', () => {
+        const backupWebpages = localStorage.getItem('backup_webpagesData');
+        const backupCategories = localStorage.getItem('backup_categoriesData');
+
+        if (!backupWebpages || !backupCategories) {
+            alert('復元できるバックアップデータがありません。');
+            return;
+        }
+
+        if (confirm('バックアップからデータを復元しますか？\n現在のデータは上書きされます。')) {
+            webpages = JSON.parse(backupWebpages);
+            categories = JSON.parse(backupCategories);
+            
+            saveDataToLocalStorage();
+            activeCategory = '総合';
+            render();
+            alert('データを復元しました。');
+        }
+    });
+    // ▲▲▲▲▲ ここまで追加 ▲▲▲▲▲
     
+    addCategoryBtn.addEventListener('click', () => {
+        const newCategory = newCategoryNameInput.value.trim();
+        if (!newCategory) {
+            alert('カテゴリ名を入力してください。');
+            return;
+        }
+        if (categories.includes(newCategory)) {
+            alert('そのカテゴリ名は既に存在します。');
+            return;
+        }
+        categories.push(newCategory);
+        newCategoryNameInput.value = '';
+        render();
+        saveDataToLocalStorage();
+        alert(`カテゴリ「${newCategory}」を追加しました。`);
+    });
+
+    categoryListContainer.addEventListener('click', e => {
+        const target = e.target;
+        const item = target.closest('.category-manage-item');
+        if (!item) return;
+
+        const categoryName = item.dataset.categoryName;
+
+        if (target.classList.contains('delete-category-btn')) {
+            const isUsed = webpages.some(w => w.category === categoryName);
+            if (isUsed) {
+                alert(`カテゴリ「${categoryName}」はWebページで使用されているため削除できません。`);
+                return;
+            }
+            if (confirm(`カテゴリ「${categoryName}」を削除しますか？`)) {
+                categories = categories.filter(c => c !== categoryName);
+                if (activeCategory === categoryName) {
+                    activeCategory = '総合';
+                }
+                render();
+                saveDataToLocalStorage();
+            }
+        } else if (target.classList.contains('edit-category-btn')) {
+            const nameSpan = item.querySelector('.category-name');
+            item.innerHTML = `
+                <input type="text" class="edit-category-input" value="${nameSpan.textContent}">
+                <div class="category-actions">
+                    <button class="save-category-btn">保存</button>
+                    <button class="cancel-category-btn">キャンセル</button>
+                </div>`;
+            item.querySelector('.edit-category-input').focus();
+        } else if (target.classList.contains('save-category-btn')) {
+            const input = item.querySelector('.edit-category-input');
+            const newName = input.value.trim();
+            const oldName = item.dataset.categoryName;
+
+            if (!newName) {
+                alert('カテゴリ名を入力してください。');
+                return;
+            }
+            if (newName !== oldName && categories.includes(newName)) {
+                alert('そのカテゴリ名は既に存在します。');
+                return;
+            }
+
+            const catIndex = categories.indexOf(oldName);
+            if (catIndex > -1) {
+                categories[catIndex] = newName;
+            }
+            
+            webpages.forEach(w => {
+                if (w.category === oldName) w.category = newName;
+            });
+
+            if (activeCategory === oldName) {
+                activeCategory = newName;
+            }
+            
+            render();
+            saveDataToLocalStorage();
+        } else if (target.classList.contains('cancel-category-btn')) {
+            renderCategoryManagement();
+        }
+    });
+
     // --- CSV処理 & 取扱説明書 ---
-    // (以降のコードは変更ありません)
     const downloadCSV = (csvContent, fileName) => {
         const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
         const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -258,9 +397,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }));
     manualBtn.addEventListener('click', () => {
         const manualWindow = window.open('', 'manual', 'width=800,height=700,scrollbars=yes');
+        // ▼▼▼▼▼ ここからが修正された箇所です ▼▼▼▼▼
         const manualHTML = `
-            <!DOCTYPE html><html lang="ja"><head><title>取扱説明書</title><style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', 'Noto Sans CJK JP', sans-serif; line-height: 1.8; padding: 10px 30px; color: #333; } h1, h2, h3 { color: #29b6f6; } h1 { font-size: 2em; text-align: center; } h2 { font-size: 1.6em; border-bottom: 3px solid #29b6f6; padding-bottom: 8px; margin-top: 40px; } h3 { font-size: 1.2em; border-left: 5px solid #ffca28; padding-left: 10px; margin-top: 30px;} code { background: #eef; color: #d63384; padding: 3px 6px; border-radius: 4px; font-family: Consolas, Monaco, monospace; } ul { padding-left: 20px; list-style-type: "✓ "; } li { margin-bottom: 12px; } p { margin-left: 5px; } .important { background-color: #fffbe6; border: 1px solid #ffe58f; border-radius: 8px; padding: 15px; } .important b { color: #d9534f; }</style></head><body><h1>Web閲覧リスト 取扱説明書</h1><h2>概要</h2><p>このアプリケーションは、お気に入りのWebページをカテゴリ別に整理・管理するためのツールです。登録したデータはブラウザに自動で保存され、次回開いたときに復元されます。手動でCSVファイルとして保存・読込することも可能です。</p><h2>自動保存機能について</h2><ul><li>Webページの追加、更新、削除を行うと、その内容は<b>自動的にご利用のブラウザに保存</b>されます。</li><li>ブラウザを閉じたり、PCを再起動してもデータは消えません。</li><li class="important"><b>【注意】</b>ブラウザの履歴やキャッシュを完全に削除すると、保存されたデータも消える可能性があります。重要なデータは定期的にCSVファイルとして保存（エクスポート）することを推奨します。</li></ul><h2>基本操作</h2><h3>1. Webページの登録</h3><ul><li>画面右側のパネルで<b>「登録」</b>タブが選択されていることを確認します。</li><li><b>タイトル</b>、<b>URL</b>、<b>カテゴリ</b>を選択します。必要に応じて<b>メモ</b>も記入できます。</li><li><code>登録する</code>ボタンを押すと一覧に追加され、自動で保存されます。</li></ul><h3>2. Webページの閲覧</h3><ul><li>画面左上のカテゴリタブをクリックすると、そのカテゴリに登録されたWebページのみが一覧に表示されます。</li><li>「総合」タブでは、登録された全てのWebページが表示されます。</li><li>一覧のタイトル（青い文字）をクリックすると、新しいタブでそのWebページが開きます。</li></ul><h3>3. Webページの編集</h3><ul><li>一覧表示されている項目の右側にある<code>編集</code>ボタンを押します。</li><li>画面右側のパネルが自動的に<b>「編集」</b>タブに切り替わり、クリックした項目の情報がフォームに表示されます。</li><li>フォームの内容を自由に修正し、<code>更新する</code>ボタンを押すと変更が保存されます。</li></ul><h3>4. Webページの削除</h3><ul><li>一覧表示されている項目の右側にある<code>削除</code>ボタンを押します。</li><li>確認メッセージが表示されるので、OKを押すとその項目が一覧から完全に削除され、その状態が保存されます。</li></ul><h2>データ管理（CSV形式）</h2><p>データのバックアップや、他のブラウザ・PCへデータを移行するために、手動での保存（エクスポート）と読込（インポート）が可能です。</p><h3>1. データの保存</h3><ul><li><b>Webページ保存(CSV):</b> 現在登録されている全てのWebページ情報を<code>webpages.csv</code>というファイル名でPCにダウンロードします。</li></ul><h3>2. データの読込</h3><ul><li><b>Webページ読込(CSV):</b> ボタンを押すとファイル選択画面が開きます。以前保存した<code>webpages.csv</code>などを選択すると、ファイルの内容が読み込まれ、一覧が更新されます。</li><li>CSVファイル内に、現在リストにない新しいカテゴリが含まれていた場合、そのカテゴリは自動的にリストに追加されます。</li><li class="important"><b>【注意】</b>CSVからデータを読み込むと、現在ブラウザに保存されているデータは<b>全て上書きされます</b>。</li></ul><h2>データリセット</h2><p>ヘッダーにある<code>データリセット</code>ボタンを押すと、ブラウザに保存されている全てのWebページとカテゴリの情報を削除し、アプリケーションを完全な初期状態に戻すことができます。カテゴリの順番がおかしくなった場合などにご利用ください。</p></body></html>
+            <!DOCTYPE html><html lang="ja"><head><title>取扱説明書</title><style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', 'Noto Sans CJK JP', sans-serif; line-height: 1.8; padding: 10px 30px; color: #333; } h1, h2, h3 { color: #29b6f6; } h1 { font-size: 2em; text-align: center; } h2 { font-size: 1.6em; border-bottom: 3px solid #29b6f6; padding-bottom: 8px; margin-top: 40px; } h3 { font-size: 1.2em; border-left: 5px solid #ffca28; padding-left: 10px; margin-top: 30px;} code { background: #eef; color: #d63384; padding: 3px 6px; border-radius: 4px; font-family: Consolas, Monaco, monospace; } ul { padding-left: 20px; list-style-type: "✓ "; } li { margin-bottom: 12px; } p { margin-left: 5px; } .important { background-color: #fffbe6; border: 1px solid #ffe58f; border-radius: 8px; padding: 15px; } .important b { color: #d9534f; }</style></head><body><h1>Web閲覧リスト 取扱説明書</h1><h2>概要</h2><p>このアプリケーションは、お気に入りのWebページをカテゴリ別に整理・管理するためのツールです。登録したデータはブラウザに自動で保存され、次回開いたときに復元されます。手動でCSVファイルとして保存・読込することも可能です。</p><h2>自動保存機能について</h2><ul><li>Webページの追加、更新、削除を行うと、その内容は<b>自動的にご利用のブラウザに保存</b>されます。</li><li>ブラウザを閉じたり、PCを再起動してもデータは消えません。</li><li class="important"><b>【注意】</b>ブラウザの履歴やキャッシュを完全に削除すると、保存されたデータも消える可能性があります。重要なデータは定期的にCSVファイルとして保存（エクスポート）することを推奨します。</li></ul><h2>基本操作</h2><h3>1. Webページの登録</h3><ul><li>画面右側のパネルで<b>「登録」</b>タブが選択されていることを確認します。</li><li><b>タイトル</b>、<b>URL</b>、<b>カテゴリ</b>を選択します。必要に応じて<b>メモ</b>も記入できます。</li><li><code>登録する</code>ボタンを押すと一覧に追加され、自動で保存されます。</li></ul><h3>2. Webページの閲覧</h3><ul><li>画面左上のカテゴリタブをクリックすると、そのカテゴリに登録されたWebページのみが一覧に表示されます。</li><li>「総合」タブでは、登録された全てのWebページが表示されます。</li><li>一覧のタイトル（青い文字）をクリックすると、新しいタブでそのWebページが開きます。</li></ul><h3>3. Webページの編集</h3><ul><li>一覧表示されている項目の右側にある<code>編集</code>ボタンを押します。</li><li>画面右側のパネルが自動的に<b>「編集」</b>タブに切り替わり、クリックした項目の情報がフォームに表示されます。</li><li>フォームの内容を自由に修正し、<code>更新する</code>ボタンを押すと変更が保存されます。</li></ul><h3>4. Webページの削除</h3><ul><li>一覧表示されている項目の右側にある<code>削除</code>ボタンを押します。</li><li>確認メッセージが表示されるので、OKを押すとその項目が一覧から完全に削除され、その状態が保存されます。</li></ul><h2>カテゴリの管理</h2><p>画面右側の<b>「カテゴリ管理」</b>タブから、カテゴリの追加・編集・削除ができます。</p><ul><li><b>追加：</b>新しいカテゴリ名を入力し、<code>追加する</code>ボタンを押します。</li><li><b>編集：</b>一覧の<code>編集</code>ボタンを押し、新しい名前を入力して<code>保存</code>します。関連するWebページのカテゴリも一括で更新されます。</li><li><b>削除：</b>一覧の<code>削除</code>ボタンを押します。そのカテゴリを使用しているWebページが存在しない場合のみ削除できます。</li><li>※「総合」カテゴリは編集・削除できません。</li></ul><h2>データ管理（バックアップ・CSV）</h2><p>データの保全や移行のために、2種類のバックアップ方法が利用できます。</p><h3>1. ブラウザ内バックアップ（手軽な方法）</h3><p>ブラウザ内に「セーブポイント」を作成するような機能です。データリセットの前に使ったり、現在の状態を一時的に保存したい場合に便利です。</p><ul><li><b>データバックアップ：</b> 現在の全てのWebページとカテゴリの状態をブラウザ内に一時保存します。</li><li><b>データ復元：</b> 「データバックアップ」で保存した状態を復元します。現在のデータはバックアップ時のものに上書きされます。</li></ul><h3>2. CSVファイルでの管理（確実な方法）</h3><p>データのバックアップや、他のブラウザ・PCへデータを移行するために、手動での保存（エクスポート）と読込（インポート）が可能です。</p><ul><li><b>Webページ保存(CSV):</b> 現在登録されている全てのWebページ情報を<code>webpages.csv</code>というファイル名でPCにダウンロードします。</li><li><b>Webページ読込(CSV):</b> ボタンを押すとファイル選択画面が開きます。以前保存したCSVファイルなどを選択すると、ファイルの内容が読み込まれ、一覧が更新されます。</li><li class="important"><b>【注意】</b>CSVからデータを読み込むと、現在ブラウザに保存されているデータは<b>全て上書きされます</b>。</li></ul><h2>データリセット</h2><p>ヘッダーにある<code>データリセット</code>ボタンを押すと、ブラウザに保存されている全てのWebページとカテゴリの情報を削除し、アプリケーションを完全な初期状態に戻すことができます。事前に「データバックアップ」や「Webページ保存(CSV)」を行っておくことを強く推奨します。</p></body></html>
         `;
+        // ▲▲▲▲▲ ここまでが修正された箇所です ▲▲▲▲▲
         manualWindow.document.write(manualHTML);
         manualWindow.document.close();
     });

@@ -48,35 +48,41 @@ header h1 { margin: 0; font-size: 1.8em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2
 .header-btn:hover { transform: translateY(-2px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 .header-btn.help-btn { color: var(--help-color); }
 .header-btn.help-btn:hover { background-color: var(--help-color); color: var(--white-color); }
+/* ▼▼▼▼▼ ここから追加 ▼▼▼▼▼ */
+.header-btn.action-btn-alt { color: var(--help-color); }
+.header-btn.action-btn-alt:hover { background-color: var(--help-color); color: var(--white-color); }
+/* ▲▲▲▲▲ ここまで追加 ▲▲▲▲▲ */
 .header-btn.danger-btn { color: var(--danger-color); }
 .header-btn.danger-btn:hover { background-color: var(--danger-color); color: var(--white-color); }
 .main-content { display: flex; flex-grow: 1; padding: 20px; gap: 20px; overflow: hidden; }
 .left-pane, .right-pane { background-color: var(--white-color); border-radius: var(--border-radius); box-shadow: var(--box-shadow); display: flex; flex-direction: column; padding: 20px; }
 .left-pane { width: 60%; }
 .right-pane { width: 40%; }
-.control-panel { flex-grow: 1; display: flex; flex-direction: column; }
+.control-panel {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 .tabs-container { display: flex; flex-wrap: wrap; border-bottom: 2px solid #eee; margin-bottom: 15px; flex-shrink: 0; }
 .tab { padding: 10px 20px; cursor: pointer; margin-bottom: -2px; border: 2px solid transparent; border-bottom: none; font-weight: 700; color: #aaa; transition: all 0.3s ease; }
 .tab.active { color: var(--primary-color); border-color: #eee; border-top-left-radius: var(--border-radius); border-top-right-radius: var(--border-radius); background-color: #f9f9f9; }
 .tab.disabled { color: #ccc; cursor: not-allowed; pointer-events: none; }
-
 #webpage-list-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px; /* 項目間の隙間をさらに狭く */
+    gap: 8px;
     list-style: none;
     padding: 5px;
     margin: 0 -5px;
     overflow-y: auto;
     flex-grow: 1;
 }
-
-/* ▼▼▼▼▼ 変更箇所 ▼▼▼▼▼ */
 .webpage-item {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 8px; /* 項目の内側の余白をさらに狭く */
+    padding: 8px;
     border: 1px solid #f0f0f0;
     margin-bottom: 0;
     border-radius: var(--border-radius);
@@ -89,30 +95,42 @@ header h1 { margin: 0; font-size: 1.8em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2
     font-weight: bold;
     text-decoration: none;
     color: #007bff;
-    font-size: 0.9em; /* タイトルのフォントサイズをさらに小さく */
+    font-size: 0.9em;
 }
 .item-meta {
-    font-size: 0.75em; /* カテゴリのフォントサイズをさらに小さく */
+    font-size: 0.75em;
     color: #999;
-    margin: 2px 0 0; /* タイトルとの余白を狭く */
+    margin: 2px 0 0;
+}
+.item-memo {
+    font-size: 0.75em;
+    color: #777;
+    margin: 4px 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 .item-actions { align-self: flex-end; }
 .item-actions button {
-    margin-left: 6px; /* ボタン間の余白を狭く */
-    padding: 3px 8px; /* ボタンの余白をさらに狭く */
+    margin-left: 6px;
+    padding: 3px 8px;
     border: none;
     cursor: pointer;
-    border-radius: 6px; /* ボタンの角丸を調整 */
+    border-radius: 6px;
     font-weight: 700;
     transition: all 0.2s ease;
-    font-size: 0.8em; /* ボタンの文字サイズを小さく */
+    font-size: 0.8em;
 }
-/* ▲▲▲▲▲ 変更箇所 ▲▲▲▲▲ */
-
 .item-actions button:hover { opacity: 0.8; }
 .edit-btn { background-color: var(--secondary-color); color: var(--text-color); }
 .delete-btn { background-color: var(--danger-color); color: white; }
-.control-tab-content { overflow-y: auto; }
+.control-tab-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
 .control-tab-content.hidden { display: none; }
 .control-section { margin-bottom: 30px; }
 .control-section h3 { border-bottom: 3px solid var(--primary-color); display: inline-block; padding-bottom: 5px; margin-top: 0; margin-bottom: 20px; color: var(--primary-color); }
@@ -123,8 +141,64 @@ header h1 { margin: 0; font-size: 1.8em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2
 .action-btn { background-color: var(--primary-color); }
 .danger-btn { background-color: var(--danger-color); }
 .action-btn:hover, .danger-btn:hover { opacity: 0.9; }
+#category-manage-panel .control-section:last-child {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+    min-height: 0;
+}
+#category-list-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: var(--border-radius);
+    padding: 5px;
+}
+.category-manage-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    transition: background-color 0.2s ease;
+}
+.category-manage-item:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+}
+.category-manage-item:hover {
+    background-color: #f9f9f9;
+}
+.category-name {
+    font-weight: 700;
+}
+.category-actions button {
+    margin-left: 6px;
+    padding: 3px 8px;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    font-size: 0.8em;
+    color: white;
+}
+.category-actions .edit-category-btn, .category-actions .save-category-btn {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
+.category-actions .delete-category-btn {
+    background-color: var(--danger-color);
+}
+.category-actions .cancel-category-btn {
+    background-color: #aaa;
+}
+.category-manage-item input.edit-category-input {
+    flex-grow: 1;
+    margin-right: 10px;
+    margin-bottom: 0;
+}
 @media (max-width: 1200px) {
     #webpage-list-container { grid-template-columns: 1fr; }
     .main-content { flex-direction: column; overflow-y: auto; }
-    .left-pane, .right-pane { width: auto; height: 50%; }
-}
+    .left-pane, .right-pane { width: auto; height: auto; min-height: 400px; }
+}```
