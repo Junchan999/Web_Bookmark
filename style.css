@@ -68,6 +68,29 @@ header h1 { margin: 0; font-size: 1.8em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2
 .tab { padding: 10px 20px; cursor: pointer; margin-bottom: -2px; border: 2px solid transparent; border-bottom: none; font-weight: 700; color: #aaa; transition: all 0.3s ease; }
 .tab.active { color: var(--primary-color); border-color: #eee; border-top-left-radius: var(--border-radius); border-top-right-radius: var(--border-radius); background-color: #f9f9f9; }
 .tab.disabled { color: #ccc; cursor: not-allowed; pointer-events: none; }
+
+/* ▼▼▼▼▼ ここから追加：リストタブの並べ替え用CSS ▼▼▼▼▼ */
+.tab.sortable-tab {
+    cursor: grab; /* ドラッグ可能なタブのカーソル */
+}
+.tab.sortable-tab:active {
+    cursor: grabbing;
+}
+.tab.dragging {
+    opacity: 0.5; /* ドラッグ中のタブの透明度 */
+    border: 1px dashed var(--primary-color);
+    background-color: #f0f0f0;
+}
+.tab.drag-over {
+    border-color: var(--secondary-color); /* ドラッグオーバー時のハイライト */
+    box-shadow: 0 0 5px var(--secondary-color);
+    transform: translateY(-2px); /* ドロップ位置を分かりやすくする */
+}
+.tab.non-sortable-tab {
+    cursor: default; /* 「総合」タブなどドラッグ不可なタブのカーソル */
+}
+/* ▲▲▲▲▲ ここまで追加：リストタブの並べ替え用CSS ▲▲▲▲▲ */
+
 #webpage-list-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -201,4 +224,4 @@ header h1 { margin: 0; font-size: 1.8em; text-shadow: 1px 1px 2px rgba(0,0,0,0.2
     #webpage-list-container { grid-template-columns: 1fr; }
     .main-content { flex-direction: column; overflow-y: auto; }
     .left-pane, .right-pane { width: auto; height: auto; min-height: 400px; }
-}```
+}
